@@ -1,0 +1,34 @@
+{
+  "gpu": "1",
+  "encoder_name": "resnet50",
+  "decoder_name": "dlinknet",
+  "random_seed": 1,
+  "dataset": {
+    "ds_name": "ramp",
+    "input_size": "(256, 256)",
+    "crop_size": "(256, 256)",
+    "class_num": 2,
+    "mean" : "170.53248596191, 136.12365722656, 102.73431396484",
+    "std" : "59.799628403621, 46.960481283694, 46.127124416938",
+    "data_dir": "/Users/azanchetta/fAIr-utilities/ramp-data/sample_2/preprocessed",
+    "train_file": "/Users/azanchetta/fAIr-utilities/ramp-data/sample_2/train/fair_split_train.csv",
+    "valid_file": "/Users/azanchetta/fAIr-utilities/ramp-data/sample_2/train/fair_split_val.csv",
+    "batch_size": 2,
+    "num_workers": 8
+  },
+  "optimizer": {
+    "learn_rate_encoder": 1e-3,
+    "learn_rate_decoder": 1e-2,
+    "decay_rate": 0.1,
+    "decay_step": "[50]"
+  },
+  "trainer": {
+    "criterion_name": "xent,iou",
+    "bp_loss_idx": 0,
+    "epochs": 1,
+    "save_epoch": 1,
+    "resume_epoch": 0,
+    "finetune_dir": "None",
+    "save_root": "/Users/azanchetta/OneDrive - The Alan Turing Institute/Research/projects/testingML/trials"
+  }
+}

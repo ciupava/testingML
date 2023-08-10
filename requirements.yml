@@ -1,0 +1,26 @@
+name: MLtrials
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  # - cudatoolkit=10
+  - natsort
+  - pandas
+  - pip
+  - python=3.8
+  - pytorch
+  # - torchaudio
+  # - torchsummary
+  # - torchvision
+  - tqdm
+  - pip:
+    - albumentations
+    - h5py
+    - matplotlib
+    - pandas
+    - tensorboardX
+    - torch
+    - torchaudio
+    - torchsummary
+    - torchvision
