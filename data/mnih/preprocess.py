@@ -36,7 +36,7 @@ def patch_tile(rgb_file, gt_file, patch_size, pad, overlap):
     """
     rgb = misc_utils.load_file(rgb_file)
     gt = misc_utils.load_file(gt_file)
-    np.testing.assert_array_equal(rgb.shape[:2], gt.shape)
+    np.testing.assert_array_equal(rgb.shape[:2], gt.shape[:2]) ### ANNA's EDITS HERE but probaly not correct
     grid_list = data_utils.make_grid(np.array(rgb.shape[:2]) + 2 * pad, patch_size, overlap)
     if pad > 0:
         rgb = data_utils.pad_image(rgb, pad)
@@ -115,4 +115,5 @@ if __name__ == '__main__':
     patch_mnih(data_dir=DATA_DIR,
                save_dir=save_dir,
                patch_size=(ps, ps),
-               pad=pd, overlap=ol)
+               pad=pd,
+               overlap=ol)
