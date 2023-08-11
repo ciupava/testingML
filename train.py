@@ -23,7 +23,7 @@ from data import data_loader, data_utils
 from network import network_utils, network_io
 from mrs_utils import misc_utils, metric_utils
 
-CONFIG_FILE = "trials/config_trial.json"
+CONFIG_FILE = "trials/config_mnih.json"
 
 
 def read_config():
@@ -49,7 +49,7 @@ def train_model(args, device, parallel):
     model = network_io.create_model(args)
     log_dir = os.path.join(args['save_dir'], 'log')
     writer = SummaryWriter(log_dir=log_dir)
-    # TODO add write_graph back, probably need to swith to tensorboard in pytorch
+    # TODO add write_graph back, probably need to switc h to tensorboard in pytorch
     if parallel:
         model.encoder = network_utils.DataParallelPassThrough(model.encoder)
         model.decoder = network_utils.DataParallelPassThrough(model.decoder)

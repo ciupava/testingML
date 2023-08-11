@@ -11,11 +11,14 @@ import numpy as np
 from tqdm import tqdm
 
 # Own modules
+import sys
+sys.path.append("/Users/azanchetta/OneDrive - The Alan Turing Institute/Research/projects/testingML/trials")
+print(sys.path)
 from data import data_utils
 from mrs_utils import misc_utils
 
 # Settings
-DATA_DIR = '/data/users/wh145/mnih/'
+DATA_DIR = 'trials/data/mnih/'
 SPLITS = ['train', 'valid'] # test set will be grabbed by get_images() and processed during testing
 MODES = os.listdir(os.path.join(DATA_DIR, SPLITS[0])) # sat (input), map (target)
 MEAN = (0.4251811, 0.42812928, 0.39143909)
@@ -107,7 +110,7 @@ if __name__ == '__main__':
     ps = 512
     pd = 0
     ol = 0
-    save_dir = r'/data/users/wh145/processed_mnih/'
+    save_dir = r'/Users/azanchetta/OneDrive - The Alan Turing Institute/Research/projects/testingML/trials/output/mnih/processed_mnih/'
     misc_utils.make_dir_if_not_exist(save_dir)
     patch_mnih(data_dir=DATA_DIR,
                save_dir=save_dir,

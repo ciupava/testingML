@@ -44,7 +44,7 @@
         "loss_weights": "None",
         "resume_epoch": 0,
         "save_epoch": 10,
-        "save_root": "/Users/azanchetta/OneDrive - The Alan Turing Institute/Research/projects/testingML/trials"
+        "save_root": "/Users/azanchetta/OneDrive - The Alan Turing Institute/Research/projects/testingML/models/"
     },
     "use_emau": false,
     "use_ocr": false
