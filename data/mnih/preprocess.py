@@ -5,6 +5,9 @@ This file preprocess the raw MNIH Massachusetts Roads Dataset and extract the im
 
 # Built-in
 import os
+import glob
+import pathlib
+import fnmatch
 
 # Libs
 import numpy as np
@@ -18,9 +21,11 @@ from data import data_utils
 from mrs_utils import misc_utils
 
 # Settings
-DATA_DIR = 'trials/data/mnih/'
+DATA_DIR = '/Users/azanchetta/OneDrive - The Alan Turing Institute/Research/projects/testingML/trials/data/mnih/'
 SPLITS = ['train', 'valid'] # test set will be grabbed by get_images() and processed during testing
-MODES = os.listdir(os.path.join(DATA_DIR, SPLITS[0])) # sat (input), map (target)
+# MODES = os.listdir(os.path.join(DATA_DIR, SPLITS[0])) # sat (input), map (target)
+MODES = glob.glob(os.path.join(DATA_DIR, SPLITS[0]))
+print("****\n****\nmodes is",MODES)
 MEAN = (0.4251811, 0.42812928, 0.39143909)
 STD = (0.22423858, 0.21664895, 0.22102307)
 
@@ -36,7 +41,10 @@ def patch_tile(rgb_file, gt_file, patch_size, pad, overlap):
     """
     rgb = misc_utils.load_file(rgb_file)
     gt = misc_utils.load_file(gt_file)
-    np.testing.assert_array_equal(rgb.shape[:2], gt.shape[:2]) ### ANNA's EDITS HERE but probaly not correct
+    # np.testing.assert_array_equal(rgb.shape[:2], gt.shape)
+    np.testing.assert_array_equal(rgb.shape[:2], gt.shape[:2]) ### ANNA's EDITS HERE but probably not correct
+    # the gt files ('mnih/train/map') have 3 bands, not 1 (apparently were supposed to be?), the info is in the 1st one, other are only 0s
+    # for some time I had this script work putting `gt.shape[:0]`
     grid_list = data_utils.make_grid(np.array(rgb.shape[:2]) + 2 * pad, patch_size, overlap)
     if pad > 0:
         rgb = data_utils.pad_image(rgb, pad)
@@ -59,8 +67,27 @@ def patch_mnih(data_dir, save_dir, patch_size, pad, overlap):
     """
     
     for dataset in tqdm(SPLITS, desc='Train-valid split'):
+        dir_name =os.path.join(DATA_DIR, dataset, MODES[0])
+        print('------\n-----\ndirname is', dir_name)
+        # # names = glob.glob(os.path.join(DATA_DIR, dataset, MODES[0]+ '*.tif'),
+        # #                                               recursive=True)
+        # # pattern='*.tif'
+        # # names = pathlib.PurePath(dir_name, pattern)
+        # names = fnmatch.filter(os.listdir(dir_name), '*.tif')
+        
+        # names = glob.glob(os.path.join(dir_name, '*tif'))
+        # extension = 'tif'
+        # names = glob.glob('*.{}'.format(extension))
+        # names = glob.glob(dir_name + '/**/*.tif', recursive=True) # THIS WORKS!!!
+        names = glob.glob(dir_name + '/**/*.tif', recursive=True)
+        
+        print('- - - - \n- - - -\nnames',names)
+        
+        
         FILENAMES = [
-            fname.split('.')[0] for fname in os.listdir(os.path.join(DATA_DIR, dataset, MODES[0]))
+            # fname.split('.')[0] for fname in os.listdir(os.path.join(DATA_DIR, dataset, MODES[0]))
+            fname.split('.')[0] for fname in names  #### THIS WORKS!!!
+            
         ]
         # create folders and files
         patch_dir = os.path.join(save_dir, 'patches')
@@ -69,8 +96,13 @@ def patch_mnih(data_dir, save_dir, patch_size, pad, overlap):
 
         # get rgb and gt files
         for fname in tqdm(FILENAMES, desc='File-wise'):
-            rgb_filename = os.path.join(DATA_DIR, dataset, 'sat', fname+'.tiff')
-            gt_filename = os.path.join(DATA_DIR, dataset, 'map', fname+'.tif')
+            print("fname is", fname, '***\n***')
+            onlyname = pathlib.Path(fname).stem
+            print("image name for preprocess is:", onlyname)
+            rgb_filename = os.path.join(DATA_DIR, dataset, 'sat', onlyname+'.tiff')
+            print('\n----\nrgb filename is:', rgb_filename)
+            gt_filename = os.path.join(DATA_DIR, dataset, 'map', onlyname+'.tif')
+            print('\n----\ngt filename is:', gt_filename, '\n----\n')
             for rgb_patch, gt_patch, y, x in patch_tile(rgb_filename, gt_filename, patch_size, pad, overlap):
                 rgb_patchname = '{}_y{}x{}.jpg'.format(fname, int(y), int(x))
                 gt_patchname = '{}_y{}x{}.png'.format(fname, int(y), int(x))
