@@ -23,9 +23,8 @@ from mrs_utils import misc_utils
 # Settings
 DATA_DIR = '/Users/azanchetta/OneDrive - The Alan Turing Institute/Research/projects/testingML/trials/data/mnih/'
 SPLITS = ['train', 'valid'] # test set will be grabbed by get_images() and processed during testing
-# MODES = os.listdir(os.path.join(DATA_DIR, SPLITS[0])) # sat (input), map (target)
-MODES = glob.glob(os.path.join(DATA_DIR, SPLITS[0]))
-print("****\n****\nmodes is",MODES)
+# MODES = os.listdir(os.path.join(DATA_DIR, SPLITS[0])) # sat (input), map (target)   - ORIGINAL
+MODES = [('map','*.tif'),('sat','*.tiff')]
 MEAN = (0.4251811, 0.42812928, 0.39143909)
 STD = (0.22423858, 0.21664895, 0.22102307)
 
@@ -67,49 +66,44 @@ def patch_mnih(data_dir, save_dir, patch_size, pad, overlap):
     """
     
     for dataset in tqdm(SPLITS, desc='Train-valid split'):
-        dir_name =os.path.join(DATA_DIR, dataset, MODES[0])
-        print('------\n-----\ndirname is', dir_name)
-        # # names = glob.glob(os.path.join(DATA_DIR, dataset, MODES[0]+ '*.tif'),
-        # #                                               recursive=True)
-        # # pattern='*.tif'
-        # # names = pathlib.PurePath(dir_name, pattern)
-        # names = fnmatch.filter(os.listdir(dir_name), '*.tif')
-        
-        # names = glob.glob(os.path.join(dir_name, '*tif'))
-        # extension = 'tif'
-        # names = glob.glob('*.{}'.format(extension))
-        # names = glob.glob(dir_name + '/**/*.tif', recursive=True) # THIS WORKS!!!
-        names = glob.glob(dir_name + '/**/*.tif', recursive=True)
-        
-        print('- - - - \n- - - -\nnames',names)
-        
-        
-        FILENAMES = [
-            # fname.split('.')[0] for fname in os.listdir(os.path.join(DATA_DIR, dataset, MODES[0]))
-            fname.split('.')[0] for fname in names  #### THIS WORKS!!!
+        for MY_MODE in MODES:
+            modes_folder_name = os.path.join(DATA_DIR, dataset,MY_MODE[0])
             
-        ]
-        # create folders and files
-        patch_dir = os.path.join(save_dir, 'patches')
-        misc_utils.make_dir_if_not_exist(patch_dir)
-        record_file = open(os.path.join(save_dir, 'file_list_{}.txt'.format(dataset)), 'w+')
+            print("****\n****\modes_folder_name is",modes_folder_name)
+        
+            
+            file_names_list = glob.glob(modes_folder_name + "/" + MY_MODE[1])
+            
+            #print('- - - - \n- - - -\nfile names:',file_names_list)
+            
+            
+            filenames_with_path_extension_stripped = [
+                # fname.split('.')[0] for fname in os.listdir(os.path.join(DATA_DIR, dataset, MODES[0]))
+                
+                file_name.split('.')[0] for file_name in file_names_list  #### THIS WORKS!!!
+                
+            ]
+            # create folders and files
+            patch_dir = os.path.join(save_dir, 'patches')
+            misc_utils.make_dir_if_not_exist(patch_dir)
+            record_file = open(os.path.join(save_dir, 'file_list_{}.txt'.format(dataset)), 'w+')
 
-        # get rgb and gt files
-        for fname in tqdm(FILENAMES, desc='File-wise'):
-            print("fname is", fname, '***\n***')
-            onlyname = pathlib.Path(fname).stem
-            print("image name for preprocess is:", onlyname)
-            rgb_filename = os.path.join(DATA_DIR, dataset, 'sat', onlyname+'.tiff')
-            print('\n----\nrgb filename is:', rgb_filename)
-            gt_filename = os.path.join(DATA_DIR, dataset, 'map', onlyname+'.tif')
-            print('\n----\ngt filename is:', gt_filename, '\n----\n')
-            for rgb_patch, gt_patch, y, x in patch_tile(rgb_filename, gt_filename, patch_size, pad, overlap):
-                rgb_patchname = '{}_y{}x{}.jpg'.format(fname, int(y), int(x))
-                gt_patchname = '{}_y{}x{}.png'.format(fname, int(y), int(x))
-                misc_utils.save_file(os.path.join(patch_dir, rgb_patchname), rgb_patch.astype(np.uint8))
-                misc_utils.save_file(os.path.join(patch_dir, gt_patchname), (gt_patch/255).astype(np.uint8))
-                record_file.write('{} {}\n'.format(rgb_patchname, gt_patchname))
-        record_file.close()
+            # get rgb and gt files
+            for filename_with_path_extension_stripped in tqdm(filenames_with_path_extension_stripped, desc='File-wise'):
+                print("filename is", filename_with_path_extension_stripped, '***\n***')
+                filename_extension_stripped = pathlib.Path(filename_with_path_extension_stripped).stem
+                print("image name for preprocess is:", filename_extension_stripped)
+                rgb_filename = os.path.join(DATA_DIR, dataset, 'sat', filename_extension_stripped +'.tiff')
+                print('\n----\nrgb filename is:', rgb_filename)
+                gt_filename = os.path.join(DATA_DIR, dataset, 'map', filename_extension_stripped+'.tif')
+                print('\n----\ngt filename is:', gt_filename, '\n----\n')
+                for rgb_patch, gt_patch, y, x in patch_tile(rgb_filename, gt_filename, patch_size, pad, overlap):
+                    rgb_patchname = '{}_y{}x{}.jpg'.format(filename_with_path_extension_stripped, int(y), int(x))
+                    gt_patchname = '{}_y{}x{}.png'.format(filename_with_path_extension_stripped, int(y), int(x))
+                    misc_utils.save_file(os.path.join(patch_dir, rgb_patchname), rgb_patch.astype(np.uint8))
+                    misc_utils.save_file(os.path.join(patch_dir, gt_patchname), (gt_patch/255).astype(np.uint8))
+                    record_file.write('{} {}\n'.format(rgb_patchname, gt_patchname))
+            record_file.close()
 
 
 def get_images(data_dir=DATA_DIR, dataset='test'):
