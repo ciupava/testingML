@@ -15,8 +15,12 @@ from torch import optim
 from albumentations.pytorch import ToTensorV2
 
 # Own modules
-from mrs_utils import misc_utils, metric_utils, process_block
+import sys
+sys.path.append("/Users/azanchetta/OneDrive - The Alan Turing Institute/Research/projects/testingML/trials")
+print(sys.path)
 from network import unet, pspnet, dlinknet, deeplabv3, network_utils
+from mrs_utils import misc_utils, metric_utils, process_block
+
 
 
 def create_model(args):
@@ -152,7 +156,8 @@ def get_dataset_stats(ds_name, img_dir, load_func=None, file_list=None,
         from data.deepglobeland import preprocess
         val = preprocess.get_stats_pb(img_dir)[0]
         print('Use {} mean std stats: {}'.format(ds_name, val))
-    elif ds_name == 'mnih':
+    # There are no pre-processed stats for mnih so skip this clause and use the defaults
+    elif ds_name == 'mnih skip':  
         from data.mnih import preprocess
         val = preprocess.get_stats_pb(img_dir)[0]
         print('Use {} mean std stats: {}'.format(ds_name, val))
@@ -160,7 +165,8 @@ def get_dataset_stats(ds_name, img_dir, load_func=None, file_list=None,
         from data.spca import preprocess
         val = preprocess.get_stats_pb(img_dir)[0]
         print('Use {} mean std stats: {}'.format(ds_name, val))
-    elif load_func:
+    # Also skip this block
+    elif False:  #load_func:
         try:
             val = process_block.ValueComputeProcess(
                 ds_name, os.path.join(os.path.dirname(__file__), '../data/stats/custom'),

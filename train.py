@@ -45,7 +45,7 @@ def train_model(args, device, parallel):
     :param device: the device to run the model
     :return:
     """
-    
+    print("\n\n -----------1st check---------- \n\n")
     model = network_io.create_model(args)
     log_dir = os.path.join(args['save_dir'], 'log')
     writer = SummaryWriter(log_dir=log_dir)
@@ -59,6 +59,7 @@ def train_model(args, device, parallel):
     train_params = model.set_train_params((args['optimizer']['learn_rate_encoder'],
                                            args['optimizer']['learn_rate_decoder']))
 
+    print("\n\n -----------2nd check---------- \n\n")
     # make optimizer
     optm = network_io.create_optimizer(args['optimizer']['name'], train_params, args['optimizer']['learn_rate_encoder'])
     criterions = network_io.create_loss(args, device=device)
@@ -70,6 +71,7 @@ def train_model(args, device, parallel):
     scheduler = optim.lr_scheduler.MultiStepLR(optm, milestones=eval(args['optimizer']['decay_step']),
                                                gamma=args['optimizer']['decay_rate'])
 
+    print("\n\n -----------3rd check---------- \n\n")
     # if not resume, train from scratch
     if args['trainer']['resume_epoch'] == 0 and args['trainer']['finetune_dir'] == 'None':
         print('Training decoder {} with encoder {} from scratch ...'.format(args['decoder_name'], args['encoder_name']))
@@ -85,12 +87,14 @@ def train_model(args, device, parallel):
         network_utils.load_epoch(args['save_dir'], args['trainer']['resume_epoch'], model, optm, device)
 
     # prepare training
+    print("\n\n -----------4th check---------- \n\n")
     print('Total params: {:.2f}M'.format(network_utils.get_model_size(model)))
     model.to(device)
     for c in criterions:
         c.to(device)
 
     # make data loader
+    print("\n\n -----------5th check---------- \n\n")
     ds_cfgs = [a for a in sorted(args.keys()) if 'dataset' in a]
     assert ds_cfgs[0] == 'dataset'
 
@@ -100,7 +104,7 @@ def train_model(args, device, parallel):
             load_func = data_utils.default_get_stats
         else:
             load_func = None
-
+        print("\n\n -----------6th check---------- \n\n")
         mean, std = network_io.get_dataset_stats(args[ds_cfg]['ds_name'], args[ds_cfg]['data_dir'],
                                                  mean_val=(eval(args[ds_cfg]['mean']), eval(args[ds_cfg]['std'])),
                                                  load_func=load_func, file_list=args[ds_cfg]['train_file'])
@@ -111,7 +115,7 @@ def train_model(args, device, parallel):
             batch_size=int(args[ds_cfg]['batch_size']), shuffle=True, num_workers=int(args['dataset']['num_workers']),
             drop_last=True)
         train_val_loaders['train'].append(train_loader)
-
+        print("\n\n -----------7th check---------- \n\n")
         if 'valid_file' in args[ds_cfg]:
             valid_loader = DataLoader (data_loader.get_loader(
                 args[ds_cfg]['data_dir'], args[ds_cfg]['valid_file'], transforms=tsfm_valid,
@@ -168,4 +172,5 @@ def main():
 
 
 if __name__ == '__main__':
+
     main()

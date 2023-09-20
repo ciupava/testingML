@@ -15,13 +15,14 @@ from tqdm import tqdm
 
 # Own modules
 import sys
-sys.path.append("/Users/azanchetta/OneDrive - The Alan Turing Institute/Research/projects/testingML/trials")
+sys.path.append('"/Users/azanchetta/OneDrive - The Alan Turing Institute/Research/projects/testingML/trials"')
 print(sys.path)
 from data import data_utils
 from mrs_utils import misc_utils
 
 # Settings
-DATA_DIR = '/Users/azanchetta/OneDrive - The Alan Turing Institute/Research/projects/testingML/trials/data/mnih/'
+DATA_DIR = '~/mnih/'
+# DATA_DIR = '/Users/azanchetta/OneDrive - The Alan Turing Institute/Research/projects/testingML/trials/data/mnih/'
 SPLITS = ['train', 'valid'] # test set will be grabbed by get_images() and processed during testing
 # MODES = os.listdir(os.path.join(DATA_DIR, SPLITS[0])) # sat (input), map (target)   - ORIGINAL
 MODES = [('map','*.tif'),('sat','*.tiff')]
@@ -121,7 +122,7 @@ def get_images(data_dir=DATA_DIR, dataset='test'):
     return rgb_files, gt_files
 
 
-def get_stats(img_dir):
+def get_stats_pb(img_dir):
     from data import data_utils
     from glob import glob
     rgb_imgs = []
@@ -130,6 +131,31 @@ def get_stats(img_dir):
     ds_mean, ds_std = data_utils.get_ds_stats(rgb_imgs)
     print('Mean: {}'.format(ds_mean))
     print('Std: {}'.format(ds_std))
+
+# def get_stats(img_dir):
+#     """With np.stack borrowed from inria.preprocess."""
+#     from data import data_utils
+#     from glob import glob
+#     rgb_imgs = []
+#     for set_name in ['train', 'valid', 'test']:
+#         rgb_imgs.extend(glob(os.path.join(img_dir, set_name, 'sat', '*.tiff')))
+#     ds_mean, ds_std = data_utils.get_ds_stats(rgb_imgs)
+#     print('Mean: {}'.format(ds_mean))
+#     print('Std: {}'.format(ds_std))
+#     return np.stack([ds_mean, ds_std], axis=0)
+
+# def get_stats_pb(img_dir):
+#     """Borrowed from inria.preprocess."""
+#     from mrs_utils import process_block
+#     DS_NAME = 'mnih'
+#     val = process_block.ValueComputeProcess(
+#         DS_NAME,
+#         os.path.join(os.path.dirname(__file__), '../stats/builtin'),
+#         os.path.join(os.path.dirname(__file__), '../stats/builtin/{}.npy'.format(DS_NAME)),
+#         func=get_stats
+#         ).run(img_dir=img_dir).val
+#     val_test = val
+#     return val, val_test
 
 
 if __name__ == '__main__':

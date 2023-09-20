@@ -100,6 +100,7 @@ class Base(nn.Module):
                 data_loader_others.append(network_utils.infi_loop_loader(dlo))
 
         loss_dict = {}
+        print("\n\n -----------8th check---------- \n\n")
         for img_cnt, data_dict in enumerate(tqdm(data_loaders[0], desc='{}'.format(phase))):
             if mix_batch and phase == 'train':
                 for dlo in data_loader_others:
