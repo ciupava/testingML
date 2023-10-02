@@ -6,7 +6,7 @@ This file defines data loader for some benchmarked remote sensing datasets
 # Built-in
 import os
 cwd = os.getcwd()
-print('we are in:', cwd)
+# print('we are in:', cwd)
 # Libs
 import torch
 import h5py
